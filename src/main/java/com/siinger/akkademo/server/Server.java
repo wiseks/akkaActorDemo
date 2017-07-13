@@ -58,6 +58,7 @@ public class Server {
 		actorSystem.actorOf(Props.create(ServerActor.class), "serverActor");
 		
 		List<?> list = serverCache.getKeys();
+		serverCache.get("1");
 		for(int i=0;i<100;i++){
 			for (Object obj : list) {
 				Element element = serverCache.get(obj);
