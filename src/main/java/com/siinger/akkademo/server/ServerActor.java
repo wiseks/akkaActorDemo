@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import akka.actor.UntypedActor;
 
 import com.siinger.akkademo.utils.ActorCommand;
+import com.siinger.akkademo.utils.PropertiesUtils;
 
 /**
  * ClassName: MasterActor <br/>
@@ -27,6 +28,8 @@ public class ServerActor extends UntypedActor {
 		} else if (message == ActorCommand.DO_SOMETHING_OK) {
 			logger.info(getSender().path().address().host().get() + " do something ok!");
 			getContext().stop(getSelf());
+		}else if(message instanceof String){
+			logger.info(PropertiesUtils.get("serverId")+">>>>>>>>>>"+message);
 		}
 	}
 }

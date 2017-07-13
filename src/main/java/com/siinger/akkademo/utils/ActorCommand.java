@@ -18,5 +18,7 @@ public enum ActorCommand {
 	// do something
 	DO_SOMETHING,
 
-	DO_SOMETHING_OK
+	DO_SOMETHING_OK,
+	
+	MSG
 }

@@ -1,21 +1,19 @@
 package com.siinger.akkademo.server;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import java.util.List;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.siinger.akkademo.client.AgentActor;
+import com.siinger.akkademo.utils.GsonUtil;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
-import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-
-import com.siinger.akkademo.utils.ActorCommand;
-import com.siinger.akkademo.utils.PropertiesUtils;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 /**
  * ClassName: Master <br/>
@@ -23,34 +21,85 @@ import com.typesafe.config.ConfigFactory;
  * date: 2016年8月5日 下午5:06:58 <br/>
  *
  * @author siinger
- * @version 
+ * @version
  * @since JDK 1.7
  */
 public class Server {
 	public static void main(String[] args) {
-		PropertiesUtils.load("core.properties");
-		ExecutorService executor = Executors.newFixedThreadPool(3);
-		// 启动Remote
-		executor.execute(new Runnable() {
-
-			public void run() {
-				Config config = ConfigFactory.load("master-application.conf");
-				final ActorSystem actorSystem = ActorSystem.create("ServerSystem", config.getConfig("ServerSys"));
-				actorSystem.actorOf(Props.create(ServerActor.class), "serverActor");
-				// DeployAgentAndExec.actorSystem = actorSystem;
-
-				// 创建client任务
-				String str = "akka.tcp://ServerSystem@" + PropertiesUtils.get("client.ip") + ":"
-						+ PropertiesUtils.get("client.port") + "/user/serverActor";
-				final ActorSelection remoteActor = actorSystem.actorSelection(str);
-				actorSystem.scheduler().schedule(Duration.create(10, SECONDS), Duration.create(10, SECONDS),
-						new Runnable() {
-							public void run() {
-								final ActorRef actor = actorSystem.actorOf(Props.create(ServerActor.class));
-								remoteActor.tell(ActorCommand.DO_SOMETHING, actor);
-							}
-						}, actorSystem.dispatcher());
+		System.out.println("start server……");
+		// 缓存管理器
+		CacheManager manager = CacheManager.newInstance(Server.class.getResourceAsStream("/ehcache-rmi.xml"));// new
+																												// CacheManager(fileName);
+		System.out.println(manager.getActiveConfigurationText());
+		// 取出所有的cacheName
+		String names[] = manager.getCacheNames();
+		for (String name : names) {
+			System.out.println(name);// 输出所有Cache名称
+		}
+		Config config = ConfigFactory.load("master-application.conf");
+		
+		Config childConfig = config.getConfig("ServerSys");
+		Config remoteConfig = childConfig.getConfig("akka").getConfig("remote");
+		Config addressConfig = remoteConfig.getConfig("netty.tcp");
+		String hostname = addressConfig.getString("hostname");
+		int port = addressConfig.getInt("port");
+		
+		String serverAddress = "akka.tcp://ServerSystem@" + hostname + ":"+ port + "/user/serverActor";
+		String serverIp = "ServerSys.akka.remote.netty.tcp.hostname=" + hostname;
+		ServerInfo info = new ServerInfo();
+		info.setAddress(serverAddress);
+		info.setIp(serverIp);
+		info.setServerId(config.getString("serverId"));
+		String json = GsonUtil.beanToJson(info);
+		Cache serverCache = manager.getCache("serverCache");
+		serverCache.put(new Element(info.getServerId(), json));
+		
+		
+		
+		ActorSystem actorSystem = ActorSystem.create("ServerSystem", childConfig);
+		actorSystem.actorOf(Props.create(ServerActor.class), "serverActor");
+		
+		List<?> list = serverCache.getKeys();
+		for(int i=0;i<100;i++){
+			for (Object obj : list) {
+				Element element = serverCache.get(obj);
+				ServerInfo info1 = GsonUtil.jsonToBean(element.getObjectValue().toString(), ServerInfo.class);
+				if(!info1.getServerId().equals(info.getServerId())){
+					ActorSelection remoteActor = actorSystem.actorSelection(info1.getAddress());
+					ActorRef actor = actorSystem.actorOf(Props.create(AgentActor.class));
+					remoteActor.tell("serverId="+info.getServerId()+" send msg:"+i, actor);
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-		});
+		}
+		
+//		ExecutorService executor = Executors.newFixedThreadPool(3);
+//		// 启动Remote
+//		executor.execute(new Runnable() {
+//
+//			public void run() {
+//				Config config = ConfigFactory.load("master-application.conf");
+//				final ActorSystem actorSystem = ActorSystem.create("ServerSystem", config.getConfig("ServerSys"));
+//				actorSystem.actorOf(Props.create(ServerActor.class), "serverActor");
+//				// DeployAgentAndExec.actorSystem = actorSystem;
+//				List<?> list = clientCache.getKeys();
+//				for(Object obj : list){
+//					Element clientAddress = clientCache.get(obj);
+//					String str = clientAddress.getObjectValue().toString();
+//					final ActorSelection remoteActor = actorSystem.actorSelection(str);
+//					actorSystem.scheduler().schedule(Duration.create(10, SECONDS), Duration.create(10, SECONDS),
+//							new Runnable() {
+//								public void run() {
+//									final ActorRef actor = actorSystem.actorOf(Props.create(ServerActor.class));
+//									remoteActor.tell(ActorCommand.DO_SOMETHING, actor);
+//								}
+//							}, actorSystem.dispatcher());
+//				}
+//			}
+//		});
 	}
 }
