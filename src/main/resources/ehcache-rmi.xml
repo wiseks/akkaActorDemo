@@ -37,18 +37,6 @@
             properties="bootstrapAsynchronously=false"/>
     </cache>
     
-     <cache name="clientCache"
-           maxElementsInMemory="2147483647"
-           eternal="false"
-           timeToIdleSeconds="259200000"
-           memoryStoreEvictionPolicy="LRU"
-           timeToLiveSeconds="259200000">
-        <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
-                                   properties="replicateAsynchronously=true,  replicatePuts=true, replicateUpdates=true,  replicateUpdatesViaCopy=true, replicateRemovals=true"/>
-        <bootstrapCacheLoaderFactory 
-            class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory"
-            properties="bootstrapAsynchronously=false"/>
-    </cache>
     <!--
     ·name：Cache的唯一标识
     · maxElementsInMemory：内存中最大缓存对象数。

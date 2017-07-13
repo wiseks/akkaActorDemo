@@ -34,24 +34,22 @@ public class Server {
 		// 取出所有的cacheName
 		String names[] = manager.getCacheNames();
 		for (String name : names) {
-			System.out.println(name);// 输出所有Cache名称
+			System.out.println("config cacheName:"+name);// 输出所有Cache名称
 		}
+		Cache serverCache = manager.getCache("serverCache");
 		Config config = ConfigFactory.load("master-application.conf");
-		
 		Config childConfig = config.getConfig("ServerSys");
-		Config remoteConfig = childConfig.getConfig("akka").getConfig("remote");
-		Config addressConfig = remoteConfig.getConfig("netty.tcp");
+		Config addressConfig = childConfig.getConfig("akka").getConfig("remote").getConfig("netty.tcp");
 		String hostname = addressConfig.getString("hostname");
 		int port = addressConfig.getInt("port");
-		
+		String serverId = config.getString("serverId");
 		String serverAddress = "akka.tcp://ServerSystem@" + hostname + ":"+ port + "/user/serverActor";
 		String serverIp = "ServerSys.akka.remote.netty.tcp.hostname=" + hostname;
 		ServerInfo info = new ServerInfo();
 		info.setAddress(serverAddress);
 		info.setIp(serverIp);
-		info.setServerId(config.getString("serverId"));
+		info.setServerId(serverId);
 		String json = GsonUtil.beanToJson(info);
-		Cache serverCache = manager.getCache("serverCache");
 		serverCache.put(new Element(info.getServerId(), json));
 		
 		
