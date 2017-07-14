@@ -73,8 +73,7 @@ public class Server {
 					UserInfoMsg_23001.Builder userInfo = UserInfoMsg_23001.newBuilder();
 					userInfo.setId(1);
 					userInfo.setName("tom");
-					byte[] oldByte = userInfo.build().toByteArray();
-					Packet packet = new Packet((short)23001,oldByte);
+					Packet packet = new Packet(UserInfoMsg_23001.class,userInfo.build());
 					remoteActor.tell(packet, actor);
 					try {
 						Thread.sleep(1000);

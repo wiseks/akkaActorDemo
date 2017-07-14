@@ -2,6 +2,8 @@ package com.message;
 
 import java.io.Serializable;
 
+import com.google.protobuf.MessageLite;
+
 public class Packet implements Serializable {
 	/**
 	 * 
@@ -13,9 +15,10 @@ public class Packet implements Serializable {
 	private final Short cmd;
 	
 	
-	public Packet(Short cmd,byte[] bytes) {
-		this.cmd = cmd;
-		this.bytes = bytes;
+	public Packet(Class<?> clazz,MessageLite message) {
+		String name = clazz.getSimpleName();
+		this.cmd = Short.valueOf(name.split("_")[1]);;
+		this.bytes = message.toByteArray();
 	}
 
 	/**
