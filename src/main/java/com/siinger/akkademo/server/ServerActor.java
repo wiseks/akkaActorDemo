@@ -4,7 +4,8 @@ import org.apache.log4j.Logger;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageLite;
-import com.message.Packet;
+import com.message.Request;
+import com.message.Response;
 import com.siinger.akkademo.utils.ActorCommand;
 import com.siinger.akkademo.utils.BeanUtils;
 import com.siinger.akkademo.utils.PropertiesUtils;
@@ -34,14 +35,19 @@ public class ServerActor extends UntypedActor {
 			getContext().stop(getSelf());
 		}else if(message instanceof String){
 			logger.info(PropertiesUtils.get("serverId")+">>>>>>>>>>"+message);
-		}else if(message instanceof Packet){
-			Packet packet = (Packet)message;
+		}else if(message instanceof Request){
+			Request packet = (Request)message;
 			short cmd = packet.getCmd();
 			MessageLite packetMessage = BeanUtils.protobufMapping.message(cmd);
 			if(packetMessage!=null){
 				MessageLite msg = packetMessage.getParserForType().parseFrom(packet.getBytes());
-				BeanUtils.commandDispatcher.dispatch(msg);
+				Object response = BeanUtils.commandDispatcher.dispatch(msg);
+				if(response!=null){
+					getSender().tell(response, getSelf());
+				}
 			}
+		}else if(message instanceof Response){
+			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		}
 	}
 }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
 import com.google.protobuf.MessageLite;
+import com.message.Response;
 import com.rpg.framework.annotation.MessageHandler;
 import com.rpg.framework.annotation.MessageMapping;
 
@@ -42,9 +43,9 @@ public class CommandDispatcher {
 		return true;
 	}
 
-	public void dispatch(MessageLite message) {
+	public Object dispatch(MessageLite message) {
 		if (message == null)
-			return;
+			return null;
 
 		long starttime = System.currentTimeMillis();
 
@@ -52,11 +53,11 @@ public class CommandDispatcher {
 		boolean isClose = false;// handlerCloses.get(cmd.getMessage().getClass().getSimpleName());
 		if (null == holder || null == holder.method || null == holder.owner) {
 			log.error("RECIVE|No handler or method for message:" + message);
-			return;
+			return null;
 		}
 		if(isClose){
 			log.error("RECIVE|Close handler or method for message:" + message);
-			return;
+			return null;
 		}
 //		if (!serverConfig.isDebug()) { // 是否调试模式
 //			if (holder.noCheck()) { // 有些协议不需要如何安全校验，比如登录，看战报
@@ -81,9 +82,8 @@ public class CommandDispatcher {
 				returnValue = holder.method.invoke(holder.owner, message);
 			else if (holder.getParamSize() == 3)
 				returnValue = holder.method.invoke(holder.owner, message);
-
 			if (returnValue != null ){
-				
+				return returnValue;
 			} else {
 			}
 		} catch (Exception e) {
@@ -95,6 +95,7 @@ public class CommandDispatcher {
 		long usetime = endtime - starttime;
 		if (usetime > 500)
 			log.info(">>>>>>>cmd:" + message.getClass().getName() + " use time:" + usetime);
+		return null;
 	}
 
 	@PostConstruct
