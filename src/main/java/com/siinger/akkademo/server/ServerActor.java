@@ -39,7 +39,8 @@ public class ServerActor extends UntypedActor {
 			short cmd = packet.getCmd();
 			MessageLite packetMessage = BeanUtils.protobufMapping.message(cmd);
 			if(packetMessage!=null){
-				System.out.println(cmd);
+				MessageLite msg = packetMessage.getParserForType().parseFrom(packet.getBytes());
+				BeanUtils.commandDispatcher.dispatch(msg);
 			}
 		}
 	}

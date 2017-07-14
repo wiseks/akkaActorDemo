@@ -30,7 +30,7 @@ import net.sf.ehcache.Element;
 public class Server {
 	public static void main(String[] args) {
 		System.out.println("start server……");
-		BeanUtils.protobufMapping.initialize();
+		BeanUtils.init();
 		// 缓存管理器
 		CacheManager manager = CacheManager.newInstance(Server.class.getResourceAsStream("/ehcache-rmi.xml"));// new
 																												// CacheManager(fileName);
