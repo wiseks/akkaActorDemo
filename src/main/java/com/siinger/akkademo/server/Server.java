@@ -2,7 +2,10 @@ package com.siinger.akkademo.server;
 
 import java.util.List;
 
+import com.message.MessageMsg.UserInfoMsg_23001;
+import com.message.Packet;
 import com.siinger.akkademo.client.AgentActor;
+import com.siinger.akkademo.utils.BeanUtils;
 import com.siinger.akkademo.utils.GsonUtil;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -27,6 +30,7 @@ import net.sf.ehcache.Element;
 public class Server {
 	public static void main(String[] args) {
 		System.out.println("start server……");
+		BeanUtils.protobufMapping.initialize();
 		// 缓存管理器
 		CacheManager manager = CacheManager.newInstance(Server.class.getResourceAsStream("/ehcache-rmi.xml"));// new
 																												// CacheManager(fileName);
@@ -66,7 +70,12 @@ public class Server {
 				if(!info1.getServerId().equals(info.getServerId())){
 					ActorSelection remoteActor = actorSystem.actorSelection(info1.getAddress());
 					ActorRef actor = actorSystem.actorOf(Props.create(AgentActor.class));
-					remoteActor.tell("serverId="+info.getServerId()+" send msg:"+i, actor);
+					UserInfoMsg_23001.Builder userInfo = UserInfoMsg_23001.newBuilder();
+					userInfo.setId(1);
+					userInfo.setName("tom");
+					byte[] oldByte = userInfo.build().toByteArray();
+					Packet packet = new Packet((short)23001,oldByte);
+					remoteActor.tell(packet, actor);
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {

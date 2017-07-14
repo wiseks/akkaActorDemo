@@ -1,0 +1,7 @@
+option java_package = "com.message";
+option optimize_for = LITE_RUNTIME;
+
+message UserInfoMsg_23001 {
+	optional int32 id=1;
+	optional string name = 2;
+}

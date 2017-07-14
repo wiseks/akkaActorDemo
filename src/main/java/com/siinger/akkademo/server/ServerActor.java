@@ -2,10 +2,14 @@ package com.siinger.akkademo.server;
 
 import org.apache.log4j.Logger;
 
-import akka.actor.UntypedActor;
-
+import com.google.protobuf.Message;
+import com.google.protobuf.MessageLite;
+import com.message.Packet;
 import com.siinger.akkademo.utils.ActorCommand;
+import com.siinger.akkademo.utils.BeanUtils;
 import com.siinger.akkademo.utils.PropertiesUtils;
+
+import akka.actor.UntypedActor;
 
 /**
  * ClassName: MasterActor <br/>
@@ -30,6 +34,13 @@ public class ServerActor extends UntypedActor {
 			getContext().stop(getSelf());
 		}else if(message instanceof String){
 			logger.info(PropertiesUtils.get("serverId")+">>>>>>>>>>"+message);
+		}else if(message instanceof Packet){
+			Packet packet = (Packet)message;
+			short cmd = packet.getCmd();
+			MessageLite packetMessage = BeanUtils.protobufMapping.message(cmd);
+			if(packetMessage!=null){
+				System.out.println(cmd);
+			}
 		}
 	}
 }
