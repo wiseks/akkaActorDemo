@@ -7,6 +7,8 @@ public class ServerInfo {
 	private String ip;
 	
 	private String address;
+	
+	private int port;
 
 	public String getIp() {
 		return ip;
@@ -30,6 +32,14 @@ public class ServerInfo {
 
 	public void setServerId(String serverId) {
 		this.serverId = serverId;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 	
 }

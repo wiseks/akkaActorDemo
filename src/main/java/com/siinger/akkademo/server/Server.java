@@ -59,6 +59,7 @@ public class Server {
 		info.setAddress(serverAddress);
 		info.setIp(serverIp);
 		info.setServerId(serverId);
+		info.setPort(port);
 		String json = GsonUtil.beanToJson(info);
 		serverCache.put(new Element(info.getServerId(), json));
 		
