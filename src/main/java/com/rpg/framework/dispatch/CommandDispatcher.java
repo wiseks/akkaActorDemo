@@ -9,16 +9,11 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
-import com.google.protobuf.MessageLite;
-import com.message.Response;
+import com.google.protobuf.GeneratedMessageLite;
 import com.rpg.framework.annotation.MessageHandler;
 import com.rpg.framework.annotation.MessageMapping;
 
@@ -43,7 +38,7 @@ public class CommandDispatcher {
 		return true;
 	}
 
-	public Object dispatch(MessageLite message) {
+	public Object dispatch(GeneratedMessageLite message) {
 		if (message == null)
 			return null;
 

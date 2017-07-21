@@ -2,9 +2,9 @@ package com.siinger.akkademo.client;
 
 import org.apache.log4j.Logger;
 
-import akka.actor.UntypedActor;
-
 import com.siinger.akkademo.utils.ActorCommand;
+
+import akka.actor.UntypedAbstractActor;
 
 /**
  * ClassName: AgentActor <br/>
@@ -15,7 +15,7 @@ import com.siinger.akkademo.utils.ActorCommand;
  * @version 
  * @since JDK 1.7
  */
-public class AgentActor extends UntypedActor {
+public class AgentActor extends UntypedAbstractActor {
 
 	Logger logger = Logger.getLogger(this.getClass());
 

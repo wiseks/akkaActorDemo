@@ -1,0 +1,4 @@
+=2017-07-21 14:11:37[INFO]-[Thread: main]-[org.springframework.context.support.AbstractApplicationContext.prepareRefresh()]: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@515f550a: startup date [Fri Jul 21 14:11:37 CST 2017]; root of context hierarchy
+=2017-07-21 14:11:37[INFO]-[Thread: main]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader.loadBeanDefinitions()]: Loading XML bean definitions from class path resource [application.xml]
+=2017-07-21 14:11:37[INFO]-[Thread: main]-[com.rpg.framework.dispatch.CommandDispatcher.init()]: START|Init HandlerMethod: PlayerHandler --> userInfo --> cmd:@com.rpg.framework.annotation.MessageMapping(nocheck=false, admin=false, checkLogin=true, value=class com.message.MessageMsg$UserInfoMsg_23001)
+=2017-07-21 14:11:37[INFO]-[Thread: main]-[com.rpg.framework.dispatch.CommandDispatcher.init()]: START|Init HandlerMethod Count: 1

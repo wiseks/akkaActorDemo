@@ -15,6 +15,17 @@
 		</dependency>
 		
 		<dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-remote_2.11</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+		<!--  
+		<dependency>
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-actor_2.10</artifactId>
 			<version>2.3.0</version>
@@ -27,14 +38,17 @@
 			<version>2.3.0</version>
 		</dependency>
 		<dependency>
+		
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-agent_2.11</artifactId>
 			<version>2.3.11</version>
 		</dependency>
+		-->
+		
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-slf4j_2.10</artifactId>
-			<version>2.3.11</version>
+			<artifactId>akka-slf4j_2.11</artifactId>
+			<version>2.5.2</version>
 		</dependency>
 		
 		

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.message.MessageMsg.UserInfoMsg_23001;
-import com.message.Request;
 import com.siinger.akkademo.client.AgentActor;
 import com.siinger.akkademo.utils.BeanUtils;
 import com.siinger.akkademo.utils.GsonUtil;
@@ -80,10 +79,10 @@ public class Server {
 					UserInfoMsg_23001.Builder userInfo = UserInfoMsg_23001.newBuilder();
 					userInfo.setId(1);
 					userInfo.setName("tom");
-					Request packet = new Request(UserInfoMsg_23001.class,userInfo.build());
+//					Request packet = new Request(userInfo.build());
 					//remoteActor.tell(packet, actor);
 					ExecutionContext ec = actorSystem.dispatcher();
-					Future<Object> future = Patterns.ask(remoteActor, packet,new Timeout(FiniteDuration.create(5, TimeUnit.SECONDS)));
+					Future<Object> future = Patterns.ask(remoteActor, userInfo.build(),new Timeout(FiniteDuration.create(5, TimeUnit.SECONDS)));
 					future.onSuccess(new OnSuccess<Object>() {
 						@Override
 						public void onSuccess(Object arg0) throws Throwable {

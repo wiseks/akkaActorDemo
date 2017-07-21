@@ -20,10 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
-import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.GeneratedMessageLite;
-import com.google.protobuf.Message;
-import com.google.protobuf.MessageLite;
 
 @Component
 public class ProtobufMapping {
@@ -38,9 +35,9 @@ public class ProtobufMapping {
 
 	private static final String DEFAULT_INSTANCE_METHOD = "getDefaultInstance";
 
-	private static final Map<Short, MessageLite> cmd2Message = new HashMap<Short, MessageLite>();
+	private static final Map<String, GeneratedMessageLite> cmd2Message = new HashMap<String, GeneratedMessageLite>();
 
-	private static final Map<Class<?>, Short> messageClass2Cmd = new HashMap<Class<?>, Short>();
+	//private static final Map<Class<?>, Short> messageClass2Cmd = new HashMap<Class<?>, Short>();
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
@@ -91,16 +88,14 @@ public class ProtobufMapping {
 					Class<?> clazz = ClassUtils.forName(className, ClassUtils.getDefaultClassLoader());
 					Method getDefaultInstance = ReflectionUtils.findMethod(clazz, DEFAULT_INSTANCE_METHOD);
 					if (getDefaultInstance != null) {
-						Short shortCmd = classCmd(className);
-						MessageLite existMessage = cmd2Message.get(shortCmd);
+						GeneratedMessageLite existMessage = cmd2Message.get(className);
 						if (existMessage != null) {
 							throw new IllegalStateException(String.format("Ambiguous message found. "
 									+ "Cannot map message: %s onto: %s, There is already message: %s mapped", clazz,
-									shortCmd, existMessage.getClass()));
+									existMessage.getClass().getSimpleName(), existMessage.getClass()));
 						}
-						MessageLite messageLite = (MessageLite) ReflectionUtils.invokeMethod(getDefaultInstance, null);
-						cmd2Message.put(shortCmd, messageLite);
-						messageClass2Cmd.put(clazz, shortCmd);
+						GeneratedMessageLite messageLite = (GeneratedMessageLite) ReflectionUtils.invokeMethod(getDefaultInstance, null);
+						cmd2Message.put(className, messageLite);
 					}
 				}
 			} catch (IOException e) {
@@ -110,25 +105,8 @@ public class ProtobufMapping {
 		}
 	}
 
-	public MessageLite message(short cmd) {
-		return cmd2Message.get(cmd);
+	public GeneratedMessageLite message(GeneratedMessageLite cmd) {
+		return cmd2Message.get(cmd.getClass().getName());
 	}
 
-	public MessageLite message(short cmd, byte[] byteData) throws Exception {
-		MessageLite message = cmd2Message.get(cmd);
-		if (message != null) {
-			return message.getParserForType().parseFrom(byteData);
-		} else {
-		}
-		return message;
-	}
-
-	public Short messageCmd(Class<?> clazz) {
-		return messageClass2Cmd.get(clazz);
-	}
-
-	public static Short classCmd(String className) {
-		String cmd = className.substring(className.indexOf(CMD_SEPARATOR) + 1);
-		return Short.valueOf(cmd);
-	}
 }
